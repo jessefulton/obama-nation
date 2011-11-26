@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>@BarackObama Hears You</title>
+		<style type="text/css">
+			* { margin:0; padding: 0; }
+			body { background-color: #fde5a9; color: #00324d; }
+            #wrapper { position:relative; width: 1100px; height: 880px; }
+            .neutral {  background: transparent url('images/obama-emotions.png') scroll no-repeat bottom center; }
+            .positive {  background: transparent url('images/obama-emotions.png') scroll no-repeat bottom right; }
+            .negative {  background: transparent url('images/obama-emotions.png') scroll no-repeat bottom left; }
+            #wrapper { margin: 50px auto; }
+            #tweet { position:absolute; top: 55px; right: 55px; width: 540px; font-size: 54px; font-family: Gotham, Hevetica, Arial, Serif; font-weight: bold; text-transform: uppercase; text-shadow: #d23c38 0px 0px 8px;} 
+		</style>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script type="text/javascript">
+		function htmlEncode(value){
+		  return $('<div/>').text(value).html();
+		}
+		
+		function htmlDecode(value){
+		  return $('<div/>').html(value).text();
+		}
+
+		var quotes = [];
+		var lookups = 0;
+
+		var READY = false;
+
+		function foobar(obj) {
+			quotes = obj.results;
+			//console.log(quotes);
+			
+			for (var i=0; i<quotes.length; i++) {
+				var quote = quotes[i];
+				var tweet = htmlEncode(quote.text);
+
+				$.ajax({
+				  url: "http://www.emotivetext.com/api?callback=?",
+				  data: { text: tweet },
+				  success: (function(q) {
+				  	var ret = function(data) {
+					  	//missing "generalWeight" and "valence"
+					  	q.emotions = data.emotions;
+					  	lookups++;
+					  	if (lookups >= quotes.length) {
+					  		READY = true;
+							console.log("READY");
+					  	}
+					};
+					return ret;
+				  })(quote),
+				  dataType: 'jsonp',
+				  context: quote
+				});
+/*
+				$.getJSON("http://www.emotivetext.com/api?callback=?",
+				  { text: tweet },
+				  function(data) {
+				  	//missing "generalWeight" and "valence"
+				  	quote.emotions = data.emotions;
+				  	//console.log(quote);
+				  	console.log(quotes);
+				  }
+				);
+*/			
+			}
+		}
+
+		var NEUTRAL = -1;
+		var HAPPINESS = 0;
+		var SADNESS = 1;
+		var FEAR = 2;
+		var ANGER = 3;
+		var DISGUST = 4;
+		var SURPRISE = 5;
+		
+		var changeToQuote = function(i) {
+	    	$("#tweet").fadeOut(2500, function() {
+
+	    		$("#wrapper").removeClass("positive").removeClass("negative").removeClass("neutral");
+	    		$("#wrapper").addClass('neutral');
+	    		
+		    	var activeQuote = quotes[i];
+		    	//console.log(activeQuote);
+	        	$("#tweet").text(htmlDecode(activeQuote.text));
+	        	$("#tweet").fadeIn(2500, function() {
+		        	$("#wrapper").removeClass("positive").removeClass("negative").removeClass("neutral");
+
+		        	var customValence = 0;
+
+		        	
+		        	//for(var j=0; j<activeQuote.emotions.length; j++) {
+			        	//var emotion = activeQuote.emotions[j];
+		        	for (var emo in activeQuote.emotions) {
+			        	var emotionWeight = activeQuote.emotions[emo];
+						if (emo.toUpperCase() == "HAPPINESS"
+								|| emo.toUpperCase() == "NEUTRAL"
+								|| emo.toUpperCase() == "SURPRISE") {
+							customValence += emotionWeight;
+						}
+						else if (emo.toUpperCase() == "SADNESS"
+								|| emo.toUpperCase() == "FEAR"
+								|| emo.toUpperCase() == "ANGER"
+								|| emo.toUpperCase() == "DISGUST") {
+							customValence -= emotionWeight;
+						}
+		        	}
+		        	console.log("Custom Valence: " + customValence);
+		        	if (customValence > 0) { //(activeQuote.valence > 0) {
+		        		$("#wrapper").addClass("positive");
+		        	}
+		        	else if (customValence < 0) { //(activeQuote.valence < 0) {
+						$("#wrapper").addClass("negative");
+		        	}
+		        	else {
+			        	$("#wrapper").addClass('neutral');
+		        	}
+
+		        });
+	        });	
+		}
+		
+
+		var _COUNT = 0;
+
+		var changeQuote = function() {
+			changeToQuote(_COUNT);
+			_COUNT++;
+	    	if (_COUNT >= quotes.length) { _COUNT = 0; }
+		}
+
+		
+		function doCheck() {
+			if (READY) {
+				window.setInterval(changeQuote, 10000);
+				changeQuote();
+			}
+			else {
+				window.setTimeout(doCheck, 500);
+			}
+		}
+
+		var checking = null;
+
+		$(document).ready(doCheck);
+
+				
+		
+		</script>
+		
+		<script type="text/javascript" src="http://search.twitter.com/search.json?q=change%20to%3Abarackobama%20-RT&callback=foobar"></script>
+		
+	</head>
+	
+	<body>
+		<div id="wrapper" class="neutral">
+			<div id="tweet"></div>
+		</div>
+	</body>
+</html>
+
+
+
