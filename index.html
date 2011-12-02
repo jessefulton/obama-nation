@@ -53,17 +53,7 @@
 				  dataType: 'jsonp',
 				  context: quote
 				});
-/*
-				$.getJSON("http://www.emotivetext.com/api?callback=?",
-				  { text: tweet },
-				  function(data) {
-				  	//missing "generalWeight" and "valence"
-				  	quote.emotions = data.emotions;
-				  	//console.log(quote);
-				  	console.log(quotes);
-				  }
-				);
-*/			
+
 			}
 		}
 
@@ -82,7 +72,7 @@
 	    		$("#wrapper").addClass('neutral');
 	    		
 		    	var activeQuote = quotes[i];
-		    	//console.log(activeQuote);
+
 	        	$("#tweet").text(htmlDecode(activeQuote.text));
 	        	$("#tweet").fadeIn(2500, function() {
 		        	$("#wrapper").removeClass("positive").removeClass("negative").removeClass("neutral");
@@ -90,8 +80,6 @@
 		        	var customValence = 0;
 
 		        	
-		        	//for(var j=0; j<activeQuote.emotions.length; j++) {
-			        	//var emotion = activeQuote.emotions[j];
 		        	for (var emo in activeQuote.emotions) {
 			        	var emotionWeight = activeQuote.emotions[emo];
 						if (emo.toUpperCase() == "HAPPINESS"
@@ -149,7 +137,7 @@
 		
 		</script>
 		
-		<script type="text/javascript" src="http://search.twitter.com/search.json?q=change%20to%3Abarackobama%20-RT&callback=foobar"></script>
+		<script type="text/javascript" src="http://search.twitter.com/search.json?q=change%20to%3Abarackobama%20-RT&callback=foobar&rpp=100"></script>
 		
 	</head>
 	
