@@ -42,6 +42,8 @@
 				  	var ret = function(data) {
 					  	//missing "generalWeight" and "valence"
 					  	q.emotions = data.emotions;
+					  	q.valence = data.valence;
+					  	q.generalWeight = data.generalWeight;
 					  	lookups++;
 					  	if (lookups >= quotes.length) {
 					  		READY = true;
@@ -94,6 +96,12 @@
 							customValence -= emotionWeight;
 						}
 		        	}
+		        	
+		        	if (activeQuote.generalWeight > .5) {
+		        		customValence = activeQuote.valence;
+		        		console.log("Ignoring custom valence");
+		        	}
+		        	
 		        	console.log("Custom Valence: " + customValence);
 		        	if (customValence > 0) { //(activeQuote.valence > 0) {
 		        		$("#wrapper").addClass("positive");
